@@ -1,63 +1,68 @@
 package com.gmail.thelimeglass.SkellettCord;
 
-import javax.annotation.Nullable;
-
-import org.bukkit.event.Event;
-
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import me.dommi2212.BungeeBridge.packets.PacketCustom;
+import org.bukkit.event.Event;
 
-public class ExprBungeeYAML extends SimpleExpression<Object>{
-	
-	//bungee[[ ]cord] y[a]ml (1¦value|2¦nodes|3¦nodes with keys|4¦list) [of node] %string% (from|in) [file] %string%
-	
-	private static enum Types {
-		VALUE, NODES, NODES_KEYS, LIST
-	}
-	private Expression<String> node, file;
-	private Types type;
-	@Override
-	public Class<? extends Object> getReturnType() {
-		return Object.class;
-	}
-	@Override
-	public boolean isSingle() {
-		return type == Types.VALUE ? true : false;
-	}
-	@SuppressWarnings("unchecked")
-	public boolean init(Expression<?>[] e, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parse) {
-		if (parse.mark == 1) {
-			type = Types.VALUE;
-		} else if (parse.mark == 2) {
-			type = Types.NODES;
-		} else if (parse.mark == 3) {
-			type = Types.NODES_KEYS;
-		} else if (parse.mark == 4) {
-			type = Types.LIST;
-		}
-		node = (Expression<String>) e[0];
-		file = (Expression<String>) e[1];
-		return true;
-	}
-	@Override
-	public String toString(@Nullable Event e, boolean arg1) {
-		return "bungee[[ ]cord] y[a]ml (1¦value|2¦nodes|3¦nodes with keys|4¦list) [of node] %string% (from|in) [file] %string%";
-	}
-	@Override
-	@Nullable
-	protected Object[] get(Event e) {
-		String data = type + " " + node.getSingle(e).replace(" ", "") + " " + file.getSingle(e).replace(" ", "");
-		PacketCustom packet = new PacketCustom("SkellettCord", data);
+import javax.annotation.Nullable;
+
+public class ExprBungeeYAML extends SimpleExpression<Object> {
+
+    //bungee[[ ]cord] y[a]ml (1ï¿½value|2ï¿½nodes|3ï¿½nodes with keys|4ï¿½list) [of node] %string% (from|in) [file] %string%
+
+    private Expression<String> node, file;
+    private Types type;
+
+    @Override
+    public Class<? extends Object> getReturnType() {
+        return Object.class;
+    }
+
+    @Override
+    public boolean isSingle() {
+        return type == Types.VALUE ? true : false;
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean init(Expression<?>[] e, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parse) {
+        if (parse.mark == 1) {
+            type = Types.VALUE;
+        } else if (parse.mark == 2) {
+            type = Types.NODES;
+        } else if (parse.mark == 3) {
+            type = Types.NODES_KEYS;
+        } else if (parse.mark == 4) {
+            type = Types.LIST;
+        }
+        node = (Expression<String>) e[0];
+        file = (Expression<String>) e[1];
+        return true;
+    }
+
+    @Override
+    public String toString(@Nullable Event e, boolean arg1) {
+        return "bungee[[ ]cord] y[a]ml (1ï¿½value|2ï¿½nodes|3ï¿½nodes with keys|4ï¿½list) [of node] %string% (from|in) [file] %string%";
+    }
+
+    @Override
+    @Nullable
+    protected Object[] get(Event e) {
+        String data = type + " " + node.getSingle(e).replace(" ", "") + " " + file.getSingle(e).replace(" ", "");
+        PacketCustom packet = new PacketCustom("SkellettCord", data);
         Object value = (Object) packet.send();
         if (value != null && !value.equals("null")) {
-        	return new Object[]{value};
+            return new Object[]{value};
         }
-		return null;
-	}
-	/*@Override
+        return null;
+    }
+
+    private static enum Types {
+        VALUE, NODES, NODES_KEYS, LIST
+    }
+    /*@Override
 	public void change(Event e, Object[] delta, Changer.ChangeMode mode){
 		if (mode == ChangeMode.SET) {
 			String data = "SetPlayerDisplayName " + player.getSingle(e).getName().replace(" ", "") + " " + (String)delta[0];
